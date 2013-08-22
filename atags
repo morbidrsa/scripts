@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -e
+
+nm=${CROSS_COMPILE}nm
+addr2line=${CROSS_COMPILE}addr2line
+
+if [ $# != 2  ]; then
+    echo "Usage: $0 function binary";
+    exit 1;
+fi
+
+if [ ! -f $(which ${nm}) -o ! -f $(which ${addr2line}) ]; then
+    echo "nm and addr2line programm needed";
+    exit 1;
+fi
+
+
+function=$1
+binary=$2
+
+if [ ! -f ${binary} ]; then
+    echo "Cannot read ${binary}"
+    exit 1;
+fi
+
+addr=$(${nm} ${binary} | grep -P "[ \t]${function}" | awk '{ print $1 }')
+
+if [ "x${addr}" == "x" ]; then
+    echo "Cannot find address of function \"${function}\"";
+    exit 1;
+fi
+
+${addr2line} -i -e ${binary} ${addr} | sed 's/:/ +/g'

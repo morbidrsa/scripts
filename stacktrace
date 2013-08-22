@@ -1,0 +1,21 @@
+#!/bin/bash
+
+binary=$1
+
+if [ ! -e $binary ];
+then
+    echo "Usage $0: binary"
+fi
+
+while IFS=$" " read -r -a array
+do
+    addr=$(echo ${array[1]} | sed 's/\[//g' | sed 's/\]//g')
+    func=$(echo ${array[2]} | cut -d '+' -f 1)
+
+    fline=$(${CROSS_COMPILE}addr2line -e $binary $addr)
+
+    file=$(echo ${fline} | cut -d ':' -f 1)
+    line=$(echo ${fline} | cut -d ':' -f 2)
+
+    echo -e "${addr}\t${func}\t${file}\t${line}"
+done
