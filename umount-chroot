@@ -1,0 +1,17 @@
+#!/usr/bin/bash
+
+set -e
+
+if [[ $UID -ne 0 ]]; then
+    echo "Must be root to run $(basename $0)";
+    exit 1;
+fi
+
+if [[ $# -ne 1 ]]; then
+   echo "Usage $(basename $0) mountpoint";
+   exit 1;
+fi
+
+mountpoint=$1
+
+umount $mountpoint/{dev/pts,dev,proc,sys,}

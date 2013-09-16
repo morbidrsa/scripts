@@ -1,0 +1,32 @@
+#!/usr/bin/bash
+
+set -e
+
+if [[ $UID -ne 0 ]]; then
+    echo "Must be root to run $(basename $0)";
+    exit 1;
+fi
+
+if [[ $# -lt 2 ]]; then
+    echo "Usage $(basename $0) device mountpoint [shell]";
+    exit 1;
+fi
+
+device=$1;
+mountpoint=$2;
+
+if [[ $# -eq 3 ]]; then
+    shell=$3;
+else
+    shell=bash;
+fi
+
+mount $device $mountpoint;
+
+mount -t proc none $mountpoint/proc;
+mount -t sysfs none $mountpoint/sys;
+mount -o bind /dev $mountpoint/dev;
+mount -o bind /dev/pts $mountpoint/dev/pts;
+cp -L /etc/resolv.conf $mountpoint/etc/resolv.conf;
+
+chroot $mountpoint $shell;
