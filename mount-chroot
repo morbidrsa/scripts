@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 set -e
 
@@ -23,10 +23,23 @@ fi
 
 mount $device $mountpoint;
 
+
+if [ ! -d $mountpoint/proc ]; then
+    mkdir -p $mountpoint/proc;
+fi
 mount -t proc none $mountpoint/proc;
+
+if [ ! -d $mountpoint/sys ]; then
+    mkdir -p $mountpoint/sys;
+fi
 mount -t sysfs none $mountpoint/sys;
+
+if [ ! -d $mountpoint/dev ]; then
+    mkdir -p $mountpoint/dev/pts;
+fi
 mount -o bind /dev $mountpoint/dev;
 mount -o bind /dev/pts $mountpoint/dev/pts;
+
 cp -L /etc/resolv.conf $mountpoint/etc/resolv.conf;
 
 chroot $mountpoint $shell;
