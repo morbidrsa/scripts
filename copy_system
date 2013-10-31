@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+
+set -e
+
+if [[ $UID -ne 0 ]]; then
+    echo "Must be root to run $(basename $0)";
+    exit 1;
+fi
+
+
+if [[ $# -lt 2 ]]; then
+    echo "Usage $(basename $0) device mountpoint";
+    exit 1;
+fi
+
+device=$1;
+mountpoint=$2;
+
+if [[ $# -eq 3 ]]; then
+    fs=$3;
+else
+    fs=ext4;
+fi
+
+echo "this script will erase all partitions and reformat ${device}"
+read -p "are you sure you want to continue? y/n" yn
+
+if [[ x$yn != "xy" ]]; then
+    echo "user abort"
+fi
+
+
+nr_parts=$(fdisk -l ${device} | grep ^/ | wc -l)
+
+
+for i in $(seq 1 ${nr_parts}); do
+    echo "Deleting partitin #${i} on ${device}";
+    fdisk -u -p ${device} <<EOF
+d
+1
+
+w
+EOF
+done
+
+echo "Creating new primary partition 1 on ${device}"
+fdisk -u -p ${device} << EOF
+n
+p
+1
+
+w
+EOF
+
+mk2fs.${fs}
+
+mount ${device}1 ${mountpoint}
+
+for dir in $(ls / | grep -v ${mountpoint} |\
+	 grep -v sys |\
+	 grep -v proc |\
+	 grep -v dev); do
+    echo "Copying ${dir}"
+    cp -a ${dir} ${mountpoint}/
+done
+
+for dir in sys dev proc ${mountpoint; do
+    mkdir -p ${mountpoint}/${dir}
+done
+
+special_dirs=('sys', 'dev', 'proc');
+
+for dir in "${special_dirs[@]}"; do
+    mount -o bind /${dir} ${mountpoint}/${dir}
+done
+
+# XXX Here we assume syslinux as bootloader, for now it's ok but make it more
+# protable for future versions
+chroot ${mountpoint} bash -c 'syslinux-install-update -i -a -m'
+
+for dir in "${special_dirs[@]}"; do
+    umount ${mountpoint}/${dir}
+done
