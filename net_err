@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+device=$1
+
+if [[ x"${device}" == "x" ]]; then
+    echo "Usage: $0 net-device";
+    exit 1;
+fi
+
+if [[ $(mount | grep sysfs 2>&1 > /dev/null) ]]; then
+    echo "Sysfs not mounted"
+    exit 1
+fi
+
+
+if [[ ! -d /sys/class/net/${device} ]]; then
+    echo "No sysfs entry for net-device ${device}";
+    echo "Are you shure it exists?"
+    exit 1
+fi
+
+for err in /sys/class/net/${device}/statistics/*err*; do
+    echo -ne "$(basename ${err}): ";
+    echo $(cat ${err});
+done
