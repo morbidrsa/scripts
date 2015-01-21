@@ -1,5 +1,24 @@
 #!/usr/bin/env bash
 
+set -o errexit # error terminate script
+set -o nounset # use no unset variables
+
+function usage ()
+{
+cat <<ENDUSAGE
+
+usage:
+"$0 <netdev>"
+"$0 eth2"
+ENDUSAGE
+exit 1
+}
+
+if [[ $# -ne 1 ]] ; then
+   echo "No device given"
+   usage
+fi
+
 device=$1
 
 if [[ x"${device}" == "x" ]]; then
@@ -20,6 +39,6 @@ if [[ ! -d /sys/class/net/${device} ]]; then
 fi
 
 for err in /sys/class/net/${device}/statistics/*err*; do
-    echo -ne "$(basename ${err}): ";
-    echo $(cat ${err});
+    printf "%s %-20s" ${device} $(basename "${err}")
+    cat "${err}"
 done
