@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -e
+
+NPROCS=$(grep -c ^processor /proc/cpuinfo)
+
+die()
+{
+    COMMIT=$1
+    echo "Commit ${COMMIT} breaks the build";
+    exit 1;
+};
+
+for COMMIT in $(git log --reverse --format=format:%H origin/master..HEAD); do
+    git checkout ${COMMIT};
+    make -sj${NPROCS} 1>/dev/null || die ${COMMIT}
+done
