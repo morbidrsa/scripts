@@ -1,0 +1,27 @@
+#!/bin/sh -u
+# wrapper to call various static checkers for kernel builds.
+# Use: make C=1 CHECK='ninja-check' ...
+# done by Wolfram Sang in 2012-14, version 20140514 - WTFPLv2
+
+check_for()
+{
+	command -v $1 > /dev/null
+	ret=$?
+	[ $ret -eq 0 ] && echo "    $1" | tr a-z A-Z
+	return $ret
+}
+
+# Get filename (last argument)
+eval file_to_check=\${$#}
+
+check_for sparse && sparse -Wsparse-all "$@"
+
+check_for smatch && smatch --project=kernel "$@" 1>&2
+
+check_for cppcheck && cppcheck -f -q --template=gcc --enable=all --language=c "$file_to_check"
+
+check_for spatch && MODE=report scripts/coccicheck "$file_to_check" 1>&2
+
+check_for flawfinder && flawfinder --minlevel=0 --quiet --dataonly --singleline "$file_to_check" 1>&2
+
+check_for rats && rats --resultsonly -w 3 "$file_to_check" 1>&2
