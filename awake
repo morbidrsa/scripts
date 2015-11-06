@@ -1,0 +1,61 @@
+#!/bin/sh
+
+##
+# notify_user() - notify user that host is back alive
+#
+# @$1 host that should be alive
+#
+# Send a notification to the user that the host is back alive.
+# Notifications get send via 1) standard desktop notification,
+# a message printed on the console and an audible bell, which can
+# be translated into an urgency hint by some window managers (namely
+# i3-wm)
+notify_user() {
+	local host=$1
+	message="${host} is alive"
+
+	# Desktop notifications
+	notify-send "${message}"
+	# Console message
+	echo "${message}"
+	# and audible bell
+	echo -e "\a"
+}
+
+##
+# check_dns() - check DNS if the host is known
+#
+# @$1 host to check
+#
+# check DNS for the host or exit with an error message
+#
+check_dns() {
+	local host=$1
+	
+	host ${host} 2>&1 > /dev/null
+	RC=$?
+	if [ $RC -eq 1 ]; then
+	    echo "Unknown host: ${HOST}";
+	    exit 1
+	fi
+}
+
+main() {
+	local host=$1
+
+	if [ "x${host}" == "x" ]; then
+	    echo "Usage: $0 hostname"
+	    exit 1
+	fi
+
+	check_dns ${host}
+
+	while [ true ]; do
+	    ping -c3 ${host} 2>&1 > /dev/null \
+		&& notify_user ${host} && break;
+
+	    sleep 10;
+	done
+}
+
+main "$@"
