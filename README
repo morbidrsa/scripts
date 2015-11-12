@@ -16,4 +16,15 @@ Currently this is:
 * stacktrace:
 
   Basically the same idea, but to decode the stacktraces of kernel
-  Oops messages to find the offending line. 
+  Oops messages to find the offending line.
+
+* awake:
+
+  Ping a host in a loop to see if it is alive and send a desktop-notification
+  if it is alive. Quite handy if you wait for a test machine to be rebooted so
+  you can do something else and get your attention back when it's back alive.
+
+* ninja-check:
+
+  WSA's patch ninja checker. Run as much static analyzers on the Linux
+  kernel's make C=1 as possible.
