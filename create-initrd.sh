@@ -16,7 +16,6 @@ copy_libs_for_prog()
 	done
 }
 
-local flag
 while getopts "k:m:" flag; do
 	case ${flag} in
 		k)
