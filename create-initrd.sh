@@ -30,6 +30,7 @@ while getopts "k:m:" flag; do
 	esac
 done
 
+rm -rf initrd
 mkdir -p initrd/{bin,dev,etc,lib/modules,lib64,proc,sys,sysroot}
 pushd initrd
 ln -s bin sbin
