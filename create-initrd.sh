@@ -39,7 +39,7 @@ popd
 
 echo "#!/bin/sh" >> bin/init
 
-for mod in ${MODULES[@]}; do
+for mod in ${MODULES}; do
 	echo "echo \"Loading ${mod}\"" >> bin/init
 	echo "insmod /lib/modules/${mod}" >> bin/init
 done
@@ -64,13 +64,17 @@ chmod 755 bin/init
 
 for prog in ${PROGRAMS[@]}; do
 	absprog=$(which ${prog})
+	if [ -z ${absprog} ]; then
+		echo "${prog} not found, skipping.."
+		continue
+	fi
 	cp ${absprog} bin/
 	copy_libs_for_prog ${absprog}
 done
 
 if [ x"$KDIR" != "x" ]; then
-	for mod in ${MODULES[@]}; do
-		find $KDIR -name ${mod} | xargs cp -t lib/modules/
+	for mod in ${MODULES}; do
+		find $KDIR -name "${mod}" | xargs cp -t lib/modules/
 	done
 fi
 
