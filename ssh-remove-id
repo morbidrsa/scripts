@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if [ $# -ne 1 ]; then
+	echo "Usage: $(basename $0) hostname"
+	exit 1
+fi
+
+host=$1
+
+sed -i "/${host}/d" $HOME/.ssh/known_hosts
