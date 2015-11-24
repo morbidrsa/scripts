@@ -1,7 +1,7 @@
 #!/bin/sh
 
 PROGRAMS=('bash' 'cat' 'chroot' 'echo' 'insmod' 'mount' 'sleep')
-MODULES=('efivarfs.ko' 'mcb.ko' 'mcb-pci.ko')
+#MODULES=('efivarfs.ko' 'mcb.ko' 'mcb-pci.ko')
 
 # 
 # $1 program
@@ -15,6 +15,21 @@ copy_libs_for_prog()
 		cp $l lib64
 	done
 }
+
+local flag
+while getopts "k:m:" flag; do
+	case ${flag} in
+		k)
+			KDIR=${OPTARG}
+			;;
+		m)
+			MODULES=${OPTARG}
+			;;
+		*)
+			echo "invalid option"
+			;;
+	esac
+done
 
 mkdir -p initrd/{bin,dev,etc,lib/modules,lib64,proc,sys,sysroot}
 pushd initrd
