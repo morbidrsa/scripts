@@ -19,6 +19,10 @@ copy_libs_for_prog()
 usage()
 {
 	echo "Usage: $1 [-k kdir ] [-m '<module[ <module>][...]']" >&2
+	echo "" >&2
+	echo "  -k Directory having the kernel sources." >&2
+	echo "  -m Space separated list of kernel modules to include" >&2
+	echo "     in initrd image." >&2
 	exit 1
 }
 
