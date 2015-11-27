@@ -3,7 +3,7 @@
 PROGRAMS=('bash' 'cat' 'chroot' 'echo' 'insmod' 'mount' 'sleep')
 #MODULES=('efivarfs.ko' 'mcb.ko' 'mcb-pci.ko')
 
-# 
+#
 # $1 program
 copy_libs_for_prog()
 {
@@ -16,7 +16,14 @@ copy_libs_for_prog()
 	done
 }
 
-while getopts "k:m:" flag; do
+usage()
+{
+	echo "Usage: $1 [-k kdir ] [-m '<module[ <module>][...]']" >&2
+	exit 1
+}
+
+program=$(basename $0)
+while getopts "k:m:?" flag; do
 	case ${flag} in
 		k)
 			KDIR=${OPTARG}
@@ -24,8 +31,12 @@ while getopts "k:m:" flag; do
 		m)
 			MODULES=${OPTARG}
 			;;
+		?)
+			usage ${program}
+			;;
 		*)
 			echo "invalid option"
+			usage ${program}
 			;;
 	esac
 done
