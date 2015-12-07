@@ -1,6 +1,6 @@
 #!/bin/sh
 
-PROGRAMS=('bash' 'cat' 'chroot' 'echo' 'insmod' 'mount' 'sleep')
+PROGRAMS=('sh' 'cat' 'chroot' 'echo' 'insmod' 'mount' 'sleep')
 #MODULES=('efivarfs.ko' 'mcb.ko' 'mcb-pci.ko')
 
 #
@@ -50,7 +50,6 @@ mkdir -p initrd/{bin,dev,etc,lib/modules,lib64,proc,sys,sysroot}
 pushd initrd
 ln -s bin sbin
 pushd bin
-ln -s bash sh
 popd
 
 echo "#!/bin/sh" >> bin/init
