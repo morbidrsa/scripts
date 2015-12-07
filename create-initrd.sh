@@ -87,15 +87,30 @@ __EOF__
 
 chmod 755 bin/init
 
-for prog in ${PROGRAMS[@]}; do
-	absprog=$(which ${prog})
-	if [ -z ${absprog} ]; then
-		echo "${prog} not found, skipping.."
-		continue
-	fi
-	cp ${absprog} bin/
-	copy_libs_for_prog ${absprog}
-done
+if [ -x /usr/bin/busybox-static ]; then
+	cp /usr/bin/busybox-static bin/busybox
+	pushd bin
+	ln -s busybox sh
+	ln -s busybox insmod
+	ln -s busybox mount
+	ln -s busybox echo
+	ln -s busybox chroot
+	popd
+else
+	for lib in ld-2.22.so ld-linux.so.2; do
+		cp /lib/${lib} lib64/
+	done
+
+	for prog in ${PROGRAMS[@]}; do
+		absprog=$(which ${prog})
+		if [ -z ${absprog} ]; then
+			echo "${prog} not found, skipping.."
+			continue
+		fi
+		cp ${absprog} bin/
+		copy_libs_for_prog ${absprog}
+	done
+fi
 
 if [ x"$KDIR" != "x" ]; then
 	for mod in ${MODULES}; do
