@@ -3,6 +3,8 @@
 PROGRAMS=('sh' 'cat' 'chroot' 'echo' 'insmod' 'mount' 'sleep')
 #MODULES=('efivarfs.ko' 'mcb.ko' 'mcb-pci.ko')
 
+DEFROOT="/dev/vda3"
+
 #
 # $1 program
 copy_libs_for_prog()
@@ -18,11 +20,12 @@ copy_libs_for_prog()
 
 usage()
 {
-	echo "Usage: $1 [-k kdir ] [-m '<module[ <module>][...]']" >&2
+	echo "Usage: $1 [-k kdir ] [-m '<module[ <module>][...]'] [-r root]" >&2
 	echo "" >&2
 	echo "  -k Directory having the kernel sources." >&2
 	echo "  -m Space separated list of kernel modules to include" >&2
 	echo "     in initrd image." >&2
+	echo "  -r root= kernel option (default $DEFROOT)."  >&2
 	exit 1
 }
 
@@ -35,6 +38,9 @@ while getopts "k:m:?" flag; do
 		m)
 			MODULES=${OPTARG}
 			;;
+		r)
+			ROOT=${OPTARG}
+			;;
 		?)
 			usage ${program}
 			;;
@@ -44,6 +50,10 @@ while getopts "k:m:?" flag; do
 			;;
 	esac
 done
+
+if [ x"$ROOT" == "x" ]; then
+	ROOT=$DEFROOT
+fi
 
 rm -rf initrd
 mkdir -p initrd/{bin,dev,etc,lib/modules,lib64,proc,sys,sysroot}
@@ -67,7 +77,7 @@ mount -t sysfs /sys /sys
 mount -t devtmpfs /dev /dev
 
 # Mount rootfs to /sysroot
-mount -o ro /dev/vda1 /sysroot
+mount -o ro $ROOT /sysroot
 
 echo "Switching to new root"
 cd /sysroot
