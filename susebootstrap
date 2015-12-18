@@ -7,7 +7,15 @@ DISTRO="tumbleweed"
 usage()
 {
 	prog="$(basename $0)"
-	echo "$prog <directory>"
+	cat << __EOF__
+$prog <directory> [distribution]
+Install a minimal openSUSE to a directory.
+Where distribution is one of:
+	tumbleweed (default)
+	13.1
+	13.2
+	leap42.1
+__EOF__
 }
 
 if [ $# -lt 1 ]; then
