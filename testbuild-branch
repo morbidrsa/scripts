@@ -7,8 +7,8 @@ NPROCS=$(grep -c ^processor /proc/cpuinfo)
 
 die()
 {
-    COMMIT=$1
-    echo "Commit ${COMMIT} breaks the build";
+    local commit=$1
+    echo "Commit ${commit} breaks the build";
     exit 1;
 };
 
