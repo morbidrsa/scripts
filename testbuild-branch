@@ -2,6 +2,7 @@
 
 set -e
 
+BASE="origin/master"
 NPROCS=$(grep -c ^processor /proc/cpuinfo)
 
 die()
@@ -11,7 +12,11 @@ die()
     exit 1;
 };
 
-for COMMIT in $(git log --reverse --format=format:%H origin/master..HEAD); do
+if [ $# -eq 1 ]; then
+	BASE="$1"
+fi
+
+for COMMIT in $(git log --reverse --format=format:%H ${BASE}..HEAD); do
     git checkout ${COMMIT};
     make -sj${NPROCS} 1>/dev/null || die ${COMMIT}
 done
