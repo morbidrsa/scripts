@@ -4,6 +4,7 @@ set -e
 
 BASE="origin/master"
 NPROCS=$(grep -c ^processor /proc/cpuinfo)
+BRANCH=$(git branch -l | grep "^*" | cut -d ' ' -f 2)
 
 die()
 {
@@ -20,3 +21,6 @@ for COMMIT in $(git log --reverse --format=format:%H ${BASE}..HEAD); do
     git checkout ${COMMIT};
     make -j${NPROCS} 1>/dev/null || die ${COMMIT}
 done
+
+git checkout ${BRANCH}
+echo "Branch ${BRANCH} is fully bisecable"
