@@ -18,5 +18,5 @@ fi
 
 for COMMIT in $(git log --reverse --format=format:%H ${BASE}..HEAD); do
     git checkout ${COMMIT};
-    make -sj${NPROCS} 1>/dev/null || die ${COMMIT}
+    make -j${NPROCS} 1>/dev/null || die ${COMMIT}
 done
